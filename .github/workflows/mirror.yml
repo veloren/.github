@@ -49,21 +49,10 @@ jobs:
         working-directory: ./source
         run: git lfs migrate export --verbose --include="*" --everything --skip-fetch --yes 2>&1
 
-      - name: Push changes with provided token
-        if: ${{ contains(secrets.token, true) }}
+      - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.token }}
-          branch: ${{ github.ref }}
-          force: true
-          tags: true
-          directory: source
-
-      - name: Push changes with default token
-        if: ${{ contains(secrets.token, false) }}
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ (contains(secrets.token, true) && secrets.token) || secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
           force: true
           tags: true
