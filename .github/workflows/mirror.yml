@@ -32,8 +32,6 @@ on:
 jobs:
   mirror-remote-repo:
     runs-on: ubuntu-22.04
-    env:
-      MIRROR_TOKEN_GITHUB: ${{ contains(secrets.token, true) && secrets.token) || secrets.GITHUB_TOKEN }}
     steps:
       # Installing Git LFS with apt configures LFS in the system-level git config file (/etc/gitconfig).
       # Therefore, running `git lfs install` is not necessary.
@@ -51,10 +49,21 @@ jobs:
         working-directory: ./source
         run: git lfs migrate export --verbose --include="*" --everything --skip-fetch --yes 2>&1
 
-      - name: Push changes
+      - name: Push changes with provided token
+        if: ${{ contains(secrets.token, true) }}
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ env.MIRROR_TOKEN_GITHUB }}
+          github_token: ${{ secrets.token }}
+          branch: ${{ github.ref }}
+          force: true
+          tags: true
+          directory: source
+
+      - name: Push changes with default token
+        if: ${{ contains(secrets.token, false) }}
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
           force: true
           tags: true
