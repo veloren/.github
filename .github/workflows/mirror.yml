@@ -52,7 +52,7 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ (contains(secrets.token, true) && secrets.token) || secrets.GITHUB_TOKEN }}
+          github_token: ${{ (contains(secrets, token) && secrets.token) || secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
           force: true
           tags: true
