@@ -22,18 +22,18 @@ on:
         type: boolean
         required: false
         default: false
+    secrets:
       token:
         description: |
           The personal access token used to perform operations.
           Some permissions, such as `workflows`, are only available to PATs and not to the default GITHUB_TOKEN.
-        type: string
         required: false
-        default: ${{ secrets.GITHUB_TOKEN }}
-
 
 jobs:
   mirror-remote-repo:
     runs-on: ubuntu-22.04
+    env:
+      MIRROR_TOKEN_GITHUB: ${{ contains(secrets.token, true) && secrets.token) || secrets.GITHUB_TOKEN }}
     steps:
       # Installing Git LFS with apt configures LFS in the system-level git config file (/etc/gitconfig).
       # Therefore, running `git lfs install` is not necessary.
@@ -54,7 +54,7 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ inputs.token }}
+          github_token: ${{ env.MIRROR_TOKEN_GITHUB }}
           branch: ${{ github.ref }}
           force: true
           tags: true
