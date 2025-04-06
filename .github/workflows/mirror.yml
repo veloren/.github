@@ -22,14 +22,12 @@ on:
         type: boolean
         required: false
         default: false
+    secrets:
       token:
         description: |
           The personal access token used to perform operations.
           Some permissions, such as `workflows`, are only available to PATs and not to the default GITHUB_TOKEN.
-        type: string
         required: false
-        default: ${{ secrets.GITHUB_TOKEN }}
-
 
 jobs:
   mirror-remote-repo:
@@ -54,7 +52,7 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ inputs.token }}
+          github_token: ${{ secrets.token != '' && secrets.token || secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
           force: true
           tags: true
