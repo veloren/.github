@@ -37,8 +37,8 @@ jobs:
       # Therefore, running `git lfs install` is not necessary.
       - name: Download and install Git LFS
         run: |
-          apt-get update
-          apt-get install --assume-yes git-lfs=3.0.2-1ubuntu0.3
+          sudo apt-get update
+          sudo apt-get install --assume-yes git-lfs=3.0.2-1ubuntu0.3
 
       - name: Clone remote repository
         run: git clone --branch ${{ github.ref }} ${{ inputs.repository-url }} source
