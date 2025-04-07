@@ -32,13 +32,19 @@ on:
 jobs:
   mirror-remote-repo:
     runs-on: ubuntu-22.04
+    env:
+      GIT_LFS_VERSION: "3.6.1"
     steps:
-      # Installing Git LFS with apt configures LFS in the system-level git config file (/etc/gitconfig).
-      # Therefore, running `git lfs install` is not necessary.
-      - name: Download and install Git LFS
+      # Git LFS is moved to /usr/local/bin/ because we need our downloaded version to be executed
+      # instead of the Git LFS version included with the Ubuntu image provided by GitHub.
+      - name: Download and move Git LFS
         run: |
-          sudo apt-get update
-          sudo apt-get install --assume-yes --allow-downgrades git-lfs=3.0.2-1ubuntu0.3
+          wget https://github.com/git-lfs/git-lfs/releases/download/v${{ env.GIT_LFS_VERSION }}/git-lfs-linux-amd64-v${{ env.GIT_LFS_VERSION }}.tar.gz
+          tar xzf git-lfs-linux-amd64-v${{ env.GIT_LFS_VERSION }}.tar.gz
+          mv git-lfs-${{ env.GIT_LFS_VERSION }}/git-lfs /usr/local/bin/
+
+      - name: Configure Git LFS
+        run: git lfs install
 
       - name: Clone remote repository
         run: git clone --branch ${{ github.ref_name }} ${{ inputs.repository-url }} source
@@ -47,7 +53,10 @@ jobs:
       - name: Migrate LFS
         if: ${{ inputs.rewrite-lfs }}
         working-directory: ./source
-        run: git lfs migrate export --verbose --include="*" --everything --skip-fetch --yes 2>&1
+        timeout-minutes: 20
+        run: |
+          git lfs uninstall
+          git lfs migrate export --verbose --include="*" --everything --skip-fetch --yes 2>&1
 
       - name: Push changes
         uses: ad-m/github-push-action@master
