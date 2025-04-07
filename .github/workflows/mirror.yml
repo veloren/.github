@@ -53,6 +53,7 @@ jobs:
       - name: Migrate LFS
         if: ${{ inputs.rewrite-lfs }}
         working-directory: ./source
+        timeout-minutes: 20
         run: |
           git lfs uninstall
           git lfs migrate export --verbose --include="*" --everything --skip-fetch --yes 2>&1
