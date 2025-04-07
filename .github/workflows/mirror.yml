@@ -41,7 +41,7 @@ jobs:
           sudo apt-get install --assume-yes --allow-downgrades git-lfs=3.0.2-1ubuntu0.3
 
       - name: Clone remote repository
-        run: git clone --branch ${{ github.ref }} ${{ inputs.repository-url }} source
+        run: git clone --branch ${{ github.ref_name }} ${{ inputs.repository-url }} source
 
       # This will rewrite the git history, it will change the ID of most git objects in the mirror.
       - name: Migrate LFS
