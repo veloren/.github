@@ -22,6 +22,14 @@ on:
         type: boolean
         required: false
         default: false
+      rewrite-lfs-timeout:
+        description: |
+          The maximum number of minutes the Migrate LFS job step is allowed to run.
+          Only takes effect if rewrite-lfs is set to true.
+          The default value is 30 minutes.
+        type: number
+        required: false
+        default: 30
     secrets:
       token:
         description: |
@@ -53,7 +61,7 @@ jobs:
       - name: Migrate LFS
         if: ${{ inputs.rewrite-lfs }}
         working-directory: ./source
-        timeout-minutes: 20
+        timeout-minutes: ${{ inputs.rewrite-lfs-timeout }}
         run: |
           git lfs uninstall
           git lfs migrate export --verbose --include="*" --everything --skip-fetch --yes 2>&1
